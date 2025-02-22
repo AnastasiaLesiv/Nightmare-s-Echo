@@ -1,0 +1,28 @@
+# Тимчасові файли Unity
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+
+# Скомпільовані бібліотеки
+[Ll]ibrary/
+
+# Логи
+*.log
+
+# Локальні конфігурації користувача
+UserSettings/
+
+# Visual Studio
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.svd
+*.cachefile
+*.pdb
+*.vsconfig
+
+*.meta
