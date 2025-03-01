@@ -14,6 +14,8 @@
 UserSettings/
 
 # Visual Studio
+*.idea/
+*.vs/
 *.csproj
 *.sln
 *.suo
