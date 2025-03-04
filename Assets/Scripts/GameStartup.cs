@@ -23,12 +23,19 @@ public class GameStartup : MonoBehaviour
 
     void Update()
     {
-        _systems.Run();
+        void Update()
+        {
+            if (_systems != null)
+            {
+                _systems.Run();
+            }
+        }
     }
 
     private void AddSystems()
     {
-        
+        _systems
+            .Add(new LevelGenerationSystem());
     }
     
     private void AddOneFrames()
