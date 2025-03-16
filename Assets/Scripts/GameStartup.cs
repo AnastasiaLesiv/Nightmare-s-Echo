@@ -1,3 +1,4 @@
+using Characters.Systems;
 using UnityEngine;
 using Leopotam.Ecs;
 using Voody.UniLeo;
@@ -19,23 +20,27 @@ public class GameStartup : MonoBehaviour
         AddOneFrames();
         
         _systems.Init();
+        Debug.Log("EcsStartup Start - Systems initialized successfully");
     }
 
     void Update()
     {
-        void Update()
+        Debug.Log("EcsStartup Update - Running systems");
+        if (_systems != null)
         {
-            if (_systems != null)
-            {
-                _systems.Run();
-            }
+            _systems.Run();
         }
+        
     }
 
     private void AddSystems()
     {
         _systems
-            .Add(new LevelGenerationSystem());
+            .Add(new LevelGenerationSystem())
+            .Add(new PlayerInitializationSystem())
+            .Add(new PlayerInputSystem())
+            .Add(new MovementSystem());
+        Debug.Log("EcsStartup - Systems added successfully");
     }
     
     private void AddOneFrames()
@@ -52,6 +57,7 @@ public class GameStartup : MonoBehaviour
     {
         if (_systems == null) return;
         
+        Debug.Log("EcsStartup OnDestroy - Destroying systems");
        _systems.Destroy();
        _systems = null;
        _world.Destroy();

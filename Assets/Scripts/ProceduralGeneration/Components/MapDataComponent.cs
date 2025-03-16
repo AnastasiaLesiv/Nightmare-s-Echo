@@ -1,7 +1,9 @@
+using System;
 using Leopotam.Ecs;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public struct MapDataConponent
+public struct MapDataComponent
 {
     public int Width;
     public int Height;
@@ -9,4 +11,5 @@ public struct MapDataConponent
     public int randomFillPercent;
     
     public EcsEntity[,] TileEntities;
+    
 }

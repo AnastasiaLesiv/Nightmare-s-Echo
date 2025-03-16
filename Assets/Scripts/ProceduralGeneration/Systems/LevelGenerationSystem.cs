@@ -17,17 +17,18 @@ public class LevelGenerationSystem : IEcsInitSystem
     {
         // створюємо сутність мапи, щоб зберігати множину компонентів
         var mapEntity = _world.NewEntity();
-        ref var mapData = ref mapEntity.Get<MapDataConponent>();
-        mapData.Width = 120;
-        mapData.Height = 80;
+        ref var mapData = ref mapEntity.Get<MapDataComponent>();
+        mapData.Width = 50;
+        mapData.Height = 30;
         mapData.randomFillPercent = 44;
+        mapData.TileEntities = new EcsEntity[mapData.Width, mapData.Height];
         
         _tilemap = GameObject.Find("World").GetComponent<Tilemap>();
 
-        GenerateMap(mapData);
+        GenerateMap(ref mapData);
     }
 
-    void GenerateMap(MapDataConponent mapData)
+    void GenerateMap(ref MapDataComponent mapData)
     {
         map = new int[mapData.Width, mapData.Height];
 
@@ -38,17 +39,31 @@ public class LevelGenerationSystem : IEcsInitSystem
             SmoothMap();
         }
 
+        // 1 - purple, 2 - green, 3 - blue
+        int color = 1;//RandomNumber(0, 3);
+
         for (int x = 0; x < mapData.Width; x++)
         {
             for (int y = 0; y < mapData.Height; y++)
             {
                 int tileType = map[x, y];
                 Vector3Int position = new Vector3Int(x, y, 0); // Координати для Tilemap
+                
+                var tileEntity = _world.NewEntity();
+                ref var tileComponent = ref tileEntity.Get<MapTileComponent>();
+                tileComponent.TileType = tileType;
+                tileComponent.Color = color;
+                tileComponent.Item = default;
+                
+                mapData.TileEntities[x, y] = tileEntity;
+                
+                
 
                 //if (tileType != 0) // Пропускаємо порожні тайли
                 
-                TileBase tile = GetTileFromType(tileType); // Отримуємо відповідний Tile
+                TileBase tile = GetTileFromType(tileType, color); // Отримуємо відповідний Tile
                 _tilemap.SetTile(position, tile); // Встановлюємо тайл у Tilemap
+                //Debug.Log($"Tile spawned at {x},{y}. TileType: {tileType}");
             }
         }
     }
@@ -116,30 +131,58 @@ public class LevelGenerationSystem : IEcsInitSystem
             }
         }
         return wallCount;
-    }
+    } 
 
-    TileBase GetTileFromType(int type)
+    TileBase GetTileFromType(int type, int color)
     {
-       // TileBase[] tiles = Resources.Load("Tiles");
-        //foreach (var tile in tiles)
-        //{
+
             if (type == 1)
             {
-              
-                    //Debug.Log("Sprite was found.");
-                    return Resources.Load<TileBase>("Tiles/tile_1");
+                switch (color)
+                {
+                  case 1:   return Resources.Load<TileBase>("Tiles/purple_floor");
+                  case 2:   return Resources.Load<TileBase>("Tiles/green_floor");
+                  case 3:   return Resources.Load<TileBase>("Tiles/blue_floor");
+                  
+                }
                 
             }
-            else if (type == 0)
+            /*if (type == 0)
             {
                  //Debug.Log("Sprite was found.");
-                    return  Resources.Load<TileBase>("Tiles/tile_0");
+                    return  Resources.Load<TileBase>("Tiles/tile_1");
                 
-            }
-           
-        return null;
+            }*/
+            return null;
     }
-    
+
+    int RandomNumber(int min, int max)
+    {
+        Random rand  = new Random();
+        return  rand.Next(min, max + 1);
+    }
+
+    private void AddRandomObjects()
+    {
+        int objectsCount = map.GetLength(0) * map.GetLength(1) / 20;
+        
+        string[] objects = new string[objectsCount];
+
+        for (int i = 0; i < objectsCount; i++)
+        {
+            int x = RandomNumber(0, map.GetLength(0) - 1);
+            int y =RandomNumber(0, map.GetLength(1) - 1);
+            
+            Vector3Int position = new Vector3Int(x, y, 0);
+            TileBase tile = _tilemap.GetTile(position);
+
+            if (tile != null)
+            {
+                
+            } // Якщо на цій позиції є підлога
+            
+        }
+    }
 }
 
 
