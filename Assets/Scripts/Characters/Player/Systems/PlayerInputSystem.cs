@@ -8,7 +8,7 @@ namespace Characters.Systems
         private readonly EcsFilter<PlayerTag, DirectionComponent> directionFilter = null;
         public void Run()
         {
-            Debug.Log("Player Input System initiated");
+           // Debug.Log("Player Input System initiated");
         
             float moveX = Input.GetAxisRaw("Horizontal");
             float moveY = Input.GetAxisRaw("Vertical");
@@ -24,7 +24,7 @@ namespace Characters.Systems
                 inputDirection = new Vector2(0, moveY);
             }
 
-            Debug.Log($"Input - Horizontal: {moveX}, Vertical: {moveY}, Normalized Direction: {inputDirection}");
+            //Debug.Log($"Input - Horizontal: {moveX}, Vertical: {moveY}, Normalized Direction: {inputDirection}");
 
             foreach (var i in directionFilter)
             {
@@ -34,7 +34,7 @@ namespace Characters.Systems
                 if (!positionComponent.IsMoving) // Оновлюємо напрямок тільки якщо не рухаємося
                 {
                     directionComponent.Direction = inputDirection;
-                    Debug.Log($"Updated Direction for entity {i} to {directionComponent.Direction}");
+                    //Debug.Log($"Updated Direction for entity {i} to {directionComponent.Direction}");
                 }
             }
         }

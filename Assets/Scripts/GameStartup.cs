@@ -20,27 +20,30 @@ public class GameStartup : MonoBehaviour
         AddOneFrames();
         
         _systems.Init();
-        Debug.Log("EcsStartup Start - Systems initialized successfully");
     }
 
     void Update()
     {
-        Debug.Log("EcsStartup Update - Running systems");
         if (_systems != null)
         {
             _systems.Run();
         }
-        
     }
 
     private void AddSystems()
     {
         _systems
+            .Add(new GameManagerSystem())
             .Add(new LevelGenerationSystem())
             .Add(new PlayerInitializationSystem())
+            .Add(new CameraFollowSystem())
+            .Add(new MageInitializationSystem())
             .Add(new PlayerInputSystem())
-            .Add(new MovementSystem());
-        Debug.Log("EcsStartup - Systems added successfully");
+            .Add(new MovementSystem())
+            .Add(new MageMovementSystem())
+            .Add(new AnimationSystem())
+            .Add(new PlayerAttackInputSystem()) // Додаємо систему введення для атаки
+            .Add(new CombatSystem());;
     }
     
     private void AddOneFrames()
@@ -57,10 +60,9 @@ public class GameStartup : MonoBehaviour
     {
         if (_systems == null) return;
         
-        Debug.Log("EcsStartup OnDestroy - Destroying systems");
-       _systems.Destroy();
-       _systems = null;
-       _world.Destroy();
-       _world = null;
+        _systems.Destroy();
+        _systems = null;
+        _world.Destroy();
+        _world = null;
     }
 }

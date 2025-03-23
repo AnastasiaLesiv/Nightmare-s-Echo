@@ -8,11 +8,20 @@ namespace Characters.Systems
         private readonly EcsWorld _world = null;
         private readonly EcsFilter<PlayerTag, PositionComponent, DirectionComponent, MovableComponent> _movableFilter = null;
         private readonly EcsFilter<MapDataComponent> _mapFilter = null;
+        private readonly EcsFilter<GameStateComponent> _gameStateFilter = null;
         
-        private const float MoveSpeed = 5f;
+        private const float MoveSpeed = 3f;
 
         public void Run()
         {
+            if (_mapFilter.IsEmpty()) return;
+            if (_gameStateFilter.IsEmpty()) return;
+            
+            ref var gameState = ref _gameStateFilter.Get1(0);
+            if (gameState.CurrentMode != GameMode.Exploration) return;
+            
+            ref var mapData = ref _mapFilter.Get1(0);
+            
             foreach (var i in _movableFilter)
             {
                 ref var positionComponent = ref _movableFilter.Get2(i);
@@ -34,37 +43,27 @@ namespace Characters.Systems
                 Vector3 movement = new Vector3(direction.x, direction.y, 0) * (MoveSpeed * Time.deltaTime);
                 Vector3 newPosition = currentPosition + movement;
 
-                // Перевіряємо, чи нова позиція валідна
-                if (IsValidPosition(newPosition))
+                // Перевіряємо границі карти
+                int newX = Mathf.RoundToInt(newPosition.x);
+                int newY = Mathf.RoundToInt(newPosition.y);
+
+                // Змінюємо перевірку границь, щоб дозволити рух по всій карті
+                if (newX >= 0 && newX < mapData.Width && newY >= 0 && newY < mapData.Height)
                 {
-                    playerObj.transform.position = newPosition;
-                    positionComponent.x = Mathf.RoundToInt(newPosition.x);
-                    positionComponent.y = Mathf.RoundToInt(newPosition.y);
+                    // Перевіряємо, чи тайл прохідний
+                    var tileEntity = mapData.TileEntities[newX, newY];
+                    if (tileEntity != null && tileEntity.IsAlive() && tileEntity.Has<MapTileComponent>())
+                    {
+                        ref var tile = ref tileEntity.Get<MapTileComponent>();
+                        if (tile.TileType == 1)
+                        {
+                            playerObj.transform.position = newPosition;
+                            positionComponent.x = newX;
+                            positionComponent.y = newY;
+                        }
+                    }
                 }
             }
-        }
-
-        private bool IsValidPosition(Vector3 position)
-        {
-            int x = Mathf.RoundToInt(position.x);
-            int y = Mathf.RoundToInt(position.y);
-
-            foreach (var i in _mapFilter)
-            {
-                ref var mapData = ref _mapFilter.Get1(i);
-                if (x < 0 || x >= mapData.Width || y < 0 || y >= mapData.Height)
-                {
-                    return false;
-                }
-
-                var tileEntity = mapData.TileEntities[x, y];
-                if (tileEntity.IsAlive() && tileEntity.Has<MapTileComponent>())
-                {
-                    ref var tile = ref tileEntity.Get<MapTileComponent>();
-                    return tile.TileType == 1;
-                }
-            }
-            return false;
         }
     }
 }
